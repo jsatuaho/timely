@@ -12,6 +12,11 @@ router.get('/', asyncMiddleware(async (req, res) => {
     res.send(reservations);
 }));
 
+router.get('/:id', asyncMiddleware(async (req, res) => {
+    const reservation = await Reservation.find(req.body.service.serviceId);
+    res.send(reservation);
+}));
+
 router.post('/', auth, asyncMiddleware(async (req,res) => {
     const user = await User.findById(req.user._id)
     if (!user) return res.status(400).send('No such user.');
@@ -43,6 +48,14 @@ router.post('/', auth, asyncMiddleware(async (req,res) => {
          return console.log(ex.message);
     }
     res.send(reservation);
+}));
+
+router.patch('/:id', auth, asyncMiddleware(async(req, res) => {
+    const filter = { _id: req.params.id };
+    const updates =  req.body.updates;
+    const service = await Service.findOneAndUpdate(filter, updates);
+    console.log(service);
+    if (!service) return res.status(400).send('No such service.');
 }));
 
 module.exports = router;
